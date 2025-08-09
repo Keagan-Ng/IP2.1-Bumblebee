@@ -52,7 +52,7 @@ public class UIManager : MonoBehaviour
         nameColumnShadowText.text = pointsColumnShadowText.text = timeColumnShadowText.text = emptyBlock;
         
         entries[0] = new LeaderboardEntry { playerName = "Thomas", points = 1500, time = "01.23" };
-        entries[1] = new LeaderboardEntry { playerName = "Mysteryboi", points = 1250, time = "01.47" };
+        entries[1] = new LeaderboardEntry { playerName = "mhdgfvagbfovuysboeuvyborwuy", points = 1250, time = "01.47" };
         entries[2] = new LeaderboardEntry { playerName = "Cleo", points = 1100, time = "02.01" };
         entries[3] = new LeaderboardEntry { playerName = "Dan", points = 950,  time = "02.20" };
 

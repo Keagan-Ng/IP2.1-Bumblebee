@@ -7,6 +7,10 @@ TagManager:
   - Username
   - Points
   - Time
+  - CinemachineTarget
+  - NPC_Normal
+  - NPC_Abnormal
+  - PatrolPoint
   layers:
   - Default
   - TransparentFX
