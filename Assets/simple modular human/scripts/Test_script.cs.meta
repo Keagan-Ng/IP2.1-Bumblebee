@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 7b52a656e663b134ab6a35060e5b1c62
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/scripts/Test_script.cs
+  uploadId: 303834

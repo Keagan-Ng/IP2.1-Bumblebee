@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 9e0f5e3a7de4bae4caaa811ad88fe796
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/prefabs/crowbar_prefab.prefab
+  uploadId: 303834

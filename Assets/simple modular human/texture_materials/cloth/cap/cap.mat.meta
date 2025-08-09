@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 170307b7bf8880c4abe949c9c1c0b382
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/texture_materials/cloth/cap/cap.mat
+  uploadId: 303834

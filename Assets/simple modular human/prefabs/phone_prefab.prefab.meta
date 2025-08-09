@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ed9c68deba85fbc439267aa1ae6b7fb2
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/prefabs/phone_prefab.prefab
+  uploadId: 303834

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0278a62a44006b64bbbe9e0b8d42e8c6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/texture_materials/cloth/complet_suits/fireman_suit/fireman_suit.mat
+  uploadId: 303834

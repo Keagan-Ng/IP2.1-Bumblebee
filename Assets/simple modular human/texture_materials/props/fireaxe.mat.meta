@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 611623c1e5fb2564ca492113868b1d20
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/texture_materials/props/fireaxe.mat
+  uploadId: 303834

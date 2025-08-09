@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a2a41d0fe5c9eff4da1be3e84677b45e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/texture_materials/test_terrain_materials_textures/grid2.mat
+  uploadId: 303834

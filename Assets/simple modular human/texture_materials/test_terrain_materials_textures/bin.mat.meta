@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 02ac03e5ad810f848bfc1b3f3017d163
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/texture_materials/test_terrain_materials_textures/bin.mat
+  uploadId: 303834

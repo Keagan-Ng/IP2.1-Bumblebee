@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: dca33b01135e15542b8a9f01405acf2d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/texture_materials/cloth/t_shirt/t_shirt.mat
+  uploadId: 303834

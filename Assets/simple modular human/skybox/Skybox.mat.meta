@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 70d29ee1db5e5514dbf23cad11cfc90f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/skybox/Skybox.mat
+  uploadId: 303834

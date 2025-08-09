@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a0ba06dcbe7e3614abc1a839e6b911d1
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/texture_materials/cloth/trousers/trousers.mat
+  uploadId: 303834

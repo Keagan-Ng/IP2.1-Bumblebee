@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: afbb07c2dba29ea418285725c81e57a6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 112000000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/scene/reflection/LightingData.asset
+  uploadId: 303834

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f8103c3e099bacf42a20d6539f90ec2e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 100162
+  packageName: SIMPLE modular human
+  packageVersion: 1.0
+  assetPath: Assets/simple modular human/texture_materials/props/9mm_bullet.mat
+  uploadId: 303834
