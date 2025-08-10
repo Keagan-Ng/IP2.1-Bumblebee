@@ -6,20 +6,25 @@ public class NPCBehaviour : MonoBehaviour
 {
     NavMeshAgent myAgent; // Reference to the NavMeshAgent component
 
-    Transform targetTransform;   // The target to chase
-    Transform[] patrolPoints;    // Patrol points for patrolling
-    [SerializeField] float idleTime = 1f;         // Time to idle before patrolling
+    Transform targetTransform;      // The target to chase
+    Transform[] patrolPoints;       // Patrol points for patrolling
+    [SerializeField] float idleTime = 1f; // Time to idle before patrolling
 
-    public string currentState;                   // Current state of the agent
-    int currentPatrolIndex = 0;                   // Index of the current patrol point
-    bool playerInSight = false;                   // Is the player detected?
+    public string currentState;     // Current state of the agent
+    int  currentPatrolIndex = 0;    // Index of the current patrol point
+    bool playerInSight = false;     // Is the player detected?
+
+    // --- PedNode strolling (used when no patrolPoints are assigned) ---
+    PedNode currentNode, lastNode;
+    [SerializeField] float  nodeMinDot = 0.0f;             // 0 = 180° cone, 0.3 ≈ ±70°
+    [SerializeField] Vector2 idleRange = new Vector2(0.5f, 2.0f); // pause at nodes
 
     void Awake()
     {
         myAgent = GetComponent<NavMeshAgent>();
 
         // If patrolPoints wasn't set manually, grab all siblings tagged "PatrolPoint"
-        if (patrolPoints == null || patrolPoints.Length == 0)
+        if ((patrolPoints == null || patrolPoints.Length == 0) && transform.parent)
         {
             var pts = new System.Collections.Generic.List<Transform>();
             foreach (Transform t in transform.parent)  // iterate empty parent’s children
@@ -27,99 +32,150 @@ public class NPCBehaviour : MonoBehaviour
                 if (t.CompareTag("PatrolPoint"))
                     pts.Add(t);
             }
+            // Optional: stable order by name
+            pts.Sort((a, b) => string.Compare(a.name, b.name, System.StringComparison.OrdinalIgnoreCase));
             patrolPoints = pts.ToArray();
         }
     }
 
     void Start()
     {
-        StartCoroutine(SwitchState("Idle"));      // Start in Idle state
+        // If using node stroll and we spawned near a node, snap to it
+        if ((patrolPoints == null || patrolPoints.Length == 0) && PedNodeManager.Instance != null)
+        {
+            currentNode = PedNodeManager.Instance.Nearest(transform.position, 6f);
+        }
+
+        StartCoroutine(SwitchState("Idle")); // Start in Idle state
     }
 
     // Switches the agent's state and starts the corresponding coroutine
     IEnumerator SwitchState(string newState)
     {
         if (currentState == newState)
-            yield break;                          // Do nothing if already in this state
+            yield break; // already in this state
 
-        currentState = newState;                  // Update state
-        StartCoroutine(currentState);             // Start the new state's coroutine
+        currentState = newState;
+        StartCoroutine(currentState); // start coroutine by method name
     }
 
     // Idle state: waits for a set time or until player is detected
     IEnumerator Idle()
     {
-        float timer = 0f;                         // Timer for idle duration
+        float timer = 0f;
 
         while (currentState == "Idle")
         {
-            // If player is detected, switch to ChaseTarget state
             if (playerInSight && targetTransform != null)
             {
                 StartCoroutine(SwitchState("ChaseTarget"));
                 yield break;
             }
 
-            timer += Time.deltaTime;              // Increment timer
-            if (timer >= idleTime)                // If idle time is up, start patrolling
+            timer += Time.deltaTime;
+            if (timer >= idleTime)
             {
                 StartCoroutine(SwitchState("Patrol"));
                 yield break;
             }
 
-            yield return null;                    // Wait for next frame
+            yield return null;
         }
     }
 
-    // Patrol state: moves between patrol points
+    // Patrol state: either uses fixed patrolPoints, or PedNodes if none
     IEnumerator Patrol()
     {
-        while (currentState == "Patrol")
+        // --- A) Your existing patrol route using patrolPoints (unchanged) ---
+        if (patrolPoints != null && patrolPoints.Length > 0)
         {
-            // If player is detected, switch to ChaseTarget state
-            if (playerInSight && targetTransform != null)
+            while (currentState == "Patrol")
             {
-                StartCoroutine(SwitchState("ChaseTarget"));
-                yield break;
-            }
-
-            // If no patrol points, go back to Idle
-            if (patrolPoints.Length == 0)
-            {
-                StartCoroutine(SwitchState("Idle"));
-                yield break;
-            }
-
-            Transform currentTarget = patrolPoints[currentPatrolIndex]; // Get current patrol point
-            Vector3 worldTarget = currentTarget.position;
-            myAgent.SetDestination(worldTarget);             // Move to patrol point
-
-            // Wait until agent reaches the patrol point
-            while (Vector3.Distance(transform.position, worldTarget) > 1f)
-            {
-                // If player is detected during patrol, chase player
                 if (playerInSight && targetTransform != null)
                 {
                     StartCoroutine(SwitchState("ChaseTarget"));
                     yield break;
                 }
 
-                yield return null;                // Wait for next frame
-            }
+                if (patrolPoints.Length == 0)
+                {
+                    StartCoroutine(SwitchState("Idle"));
+                    yield break;
+                }
 
-            // Move to next patrol point, loop if at end
-            if (currentPatrolIndex < patrolPoints.Length - 1)
-            {
-                currentPatrolIndex++;
-            }
-            else
-            {
-                currentPatrolIndex = 0;           // Loop back to first patrol point
-            }
+                Transform currentTarget = patrolPoints[currentPatrolIndex];
+                Vector3 worldTarget = currentTarget.position;
+                myAgent.SetDestination(worldTarget);
 
-            // After reaching patrol point, go idle
-            StartCoroutine(SwitchState("Idle"));
-            yield break;
+                while (myAgent.pathPending || Vector3.Distance(transform.position, worldTarget) > 1f)
+                {
+                    if (playerInSight && targetTransform != null)
+                    {
+                        StartCoroutine(SwitchState("ChaseTarget"));
+                        yield break;
+                    }
+                    yield return null;
+                }
+
+                currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
+
+                StartCoroutine(SwitchState("Idle"));
+                yield break;
+            }
+        }
+        else
+        {
+            // --- B) Node-based stroll (corners/junction markers) ---
+            while (currentState == "Patrol")
+            {
+                if (playerInSight && targetTransform != null)
+                {
+                    StartCoroutine(SwitchState("ChaseTarget"));
+                    yield break;
+                }
+
+                // Ensure a starting node
+                if (!currentNode && PedNodeManager.Instance)
+                    currentNode = PedNodeManager.Instance.Nearest(transform.position, 10f);
+
+                // Pick next node
+                PedNode next = PickNextNode();
+                if (next == null)
+                {
+                    StartCoroutine(SwitchState("Idle"));
+                    yield break;
+                }
+
+                // Face and go
+                Vector3 look = next.transform.position - transform.position;
+                look.y = 0f;
+                if (look.sqrMagnitude > 0.001f)
+                    transform.rotation = Quaternion.LookRotation(look.normalized, Vector3.up);
+
+                myAgent.SetDestination(next.transform.position);
+
+                // Travel until arrival
+                while (currentState == "Patrol" &&
+                       (myAgent.pathPending || myAgent.remainingDistance > myAgent.stoppingDistance + 0.05f))
+                {
+                    if (playerInSight && targetTransform != null)
+                    {
+                        StartCoroutine(SwitchState("ChaseTarget"));
+                        yield break;
+                    }
+                    yield return null;
+                }
+
+                // Idle briefly (longer at bus stops)
+                float pause = Random.Range(idleRange.x, idleRange.y);
+                if (next.type == PedNodeType.BusStop) pause += Random.Range(1.0f, 3.0f);
+                yield return new WaitForSeconds(pause);
+
+                // Advance node state
+                lastNode = currentNode;
+                currentNode = next;
+                // loop to choose another leg
+            }
         }
     }
 
@@ -128,15 +184,14 @@ public class NPCBehaviour : MonoBehaviour
     {
         while (currentState == "ChaseTarget")
         {
-            // If player is lost, go back to Idle
             if (!playerInSight || targetTransform == null)
             {
                 StartCoroutine(SwitchState("Idle"));
                 yield break;
             }
 
-            myAgent.SetDestination(targetTransform.position); // Chase the player
-            yield return null;                                // Wait for next frame
+            myAgent.SetDestination(targetTransform.position);
+            yield return null;
         }
     }
 
@@ -145,8 +200,8 @@ public class NPCBehaviour : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            targetTransform = other.transform;    // Set player as target
-            playerInSight = true;                 // Mark player as detected
+            targetTransform = other.transform;
+            playerInSight = true;
         }
     }
 
@@ -155,8 +210,44 @@ public class NPCBehaviour : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            playerInSight = false;                // Mark player as not detected
-            targetTransform = null;               // Clear target
+            playerInSight = false;
+            targetTransform = null;
         }
+    }
+
+    // --- helper: choose a next node with forward bias & no U-turn ---
+    PedNode PickNextNode()
+    {
+        if (PedNodeManager.Instance == null) return null;
+
+        // radius from current node hint, else default
+        float radius = currentNode ? currentNode.radiusHint : 15f;
+
+        // forward bias: prefer where we're heading
+        Vector3 fwd = (myAgent.velocity.sqrMagnitude > 0.01f) ? myAgent.velocity.normalized : transform.forward;
+
+        // forward-cone first
+        var list = PedNodeManager.Instance.Candidates(transform.position, fwd, radius, lastNode, nodeMinDot);
+
+        // relax cone / expand radius if empty
+        if (list.Count == 0)
+            list = PedNodeManager.Instance.Candidates(transform.position, fwd, radius * 1.5f, lastNode, -1f);
+
+        if (list.Count == 0) return null;
+
+        // Try a few random picks that have a valid NavMesh path
+        for (int tries = 0; tries < 4; tries++)
+        {
+            var candidate = list[Random.Range(0, list.Count)];
+            var path = new NavMeshPath();
+            if (NavMesh.CalculatePath(transform.position, candidate.transform.position, NavMesh.AllAreas, path)
+                && path.status == NavMeshPathStatus.PathComplete)
+            {
+                return candidate;
+            }
+        }
+
+        // Fallback: first in list
+        return list[0];
     }
 }

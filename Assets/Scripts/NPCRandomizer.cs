@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimpleModularHumanRandomizer : MonoBehaviour
+public class NPCRandomizer : MonoBehaviour
 {
     [Header("Assign 'human_mesh'")]
     public Transform humanMesh;
@@ -43,7 +43,7 @@ public class SimpleModularHumanRandomizer : MonoBehaviour
     Transform  suitsRoot;               // cloth/complet_suits
     GameObject cap, cap2, cap3;
     GameObject chain1, chain2, chain3;
-    GameObject glasses, jacket, pullover, scarf;
+    GameObject glasses, jacket, scarf;
 
     // Tops (only these three)
     GameObject shirt, t_shirt, tank_top;
@@ -148,7 +148,7 @@ public class SimpleModularHumanRandomizer : MonoBehaviour
             // OUTERWEAR (jacket or pullover)
             if (rng.NextDouble() < outerwearChance)
             {
-                ActivateRandomPresent(jacket, pullover);
+                ActivateRandomPresent(jacket);
             }
 
             // SCARF (independent)
@@ -211,11 +211,10 @@ public class SimpleModularHumanRandomizer : MonoBehaviour
         // Hair
         hair_a = FindDeepGO(tHair, "hair_a");
         hair_b = FindDeepGO(tHair, "hair_b");
-        hair_c = FindDeepGO(tHair, "hair_c"); // unisex
-        hair_d = FindDeepGO(tHair, "hair_d"); // female
-        hair_e = FindDeepGO(tHair, "hair_e"); // male
+        hair_c = FindDeepGO(tHair, "hair_c");
+        hair_d = FindDeepGO(tHair, "hair_d");
+        hair_e = FindDeepGO(tHair, "hair_e");
 
-        // Beard (may not exist if asset stripped)
         if (tBeard)
         {
             beard_a = FindDeepGO(tBeard, "beard_a");
@@ -237,7 +236,6 @@ public class SimpleModularHumanRandomizer : MonoBehaviour
 
         glasses   = FindDeepGO(tCloth, "glasses");
         jacket    = FindDeepGO(tCloth, "jacket");
-        pullover  = FindDeepGO(tCloth, "pullover");
         scarf     = FindDeepGO(tCloth, "scarf");
 
         shirt     = FindDeepGO(tCloth, "shirt");
