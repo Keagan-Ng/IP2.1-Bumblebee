@@ -10,7 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8357326009924492643}
   - component: {fileID: 7838399540526546619}
-  m_Layer: 0
+  - component: {fileID: 7385646904943618546}
+  - component: {fileID: 9018853313561640984}
+  m_Layer: 9
   m_Name: Car_Grey
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,6 +58,55 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!65 &7385646904943618546
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4913561473299809927}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.2, y: 1.8, z: 5.2}
+  m_Center: {x: 0, y: 0.85, z: 0}
+--- !u!114 &9018853313561640984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4913561473299809927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0d73b899de538648b52c681d5cf69c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cruiseSpeed: 6
+  accel: 4
+  brakingDecel: 8
+  stopLookahead: 8
+  vehicleLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  followLookahead: 16
+  minGap: 10
+  timeHeadway: 1.5
+  leaderMatchGain: 0.8
+  graceAfterGreenSec: 6
+  isSBS: 0
+  busStopDwellSeconds: 5
+  busStopCooldown: 10
+  busStopLeftDot: 0.65
 --- !u!1 &6523470159241969892
 GameObject:
   m_ObjectHideFlags: 0
@@ -68,7 +119,7 @@ GameObject:
   - component: {fileID: 5892103060505048056}
   - component: {fileID: 1793463383755001040}
   - component: {fileID: 8427845467499114329}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Car_Grey
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -228,6 +279,10 @@ PrefabInstance:
     - target: {fileID: 4204498618666111149, guid: 82a564b79692a1946b6c4ae79c022d8a, type: 3}
       propertyPath: m_Name
       value: CarExhaust (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4204498618666111149, guid: 82a564b79692a1946b6c4ae79c022d8a, type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

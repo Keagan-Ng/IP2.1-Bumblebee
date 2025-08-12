@@ -25,12 +25,29 @@ public class NPCSpawner : MonoBehaviour
     public int   maxLocalNPCs       = 6;
 
     [Header("Layers / NavMesh")]
-    public LayerMask npcLayer;
+    public LayerMask sidewalkLayer;             // <-- set this to SideWalk layer
+    public LayerMask npcLayer;                  // used for min-spacing overlap
     public bool      requireNavMesh = true;
     public float     navMeshProbeRadius = 1.0f;
 
+    [Tooltip("If your crosswalk strips use a NavMesh area named 'Crosswalk', ignore those when spawning.")]
+    public bool rejectCrosswalkArea = true;
+
+    // cache crosswalk area bit (optional)
+    int crosswalkArea = -1;
+    int crosswalkMaskBit = 0;
+
     readonly List<Transform> alive = new List<Transform>();
     float timer;
+
+    void Awake()
+    {
+        if (rejectCrosswalkArea)
+        {
+            crosswalkArea = NavMesh.GetAreaFromName("Crosswalk");
+            if (crosswalkArea >= 0) crosswalkMaskBit = 1 << crosswalkArea;
+        }
+    }
 
     void Update()
     {
@@ -70,8 +87,10 @@ public class NPCSpawner : MonoBehaviour
 
         if (IsOnScreen(candidate)) return false;
 
-        // project to ground
-        if (!Physics.Raycast(candidate + Vector3.up * 50f, Vector3.down, out RaycastHit hit, 200f, ~0, QueryTriggerInteraction.Collide))
+        // project to ground: ONLY hit SideWalk layer
+        if (!Physics.Raycast(candidate + Vector3.up * 50f, Vector3.down,
+                             out RaycastHit hit, 200f, sidewalkLayer,
+                             QueryTriggerInteraction.Collide))
             return false;
 
         Vector3 spawnPoint = hit.point + Vector3.up * 0.05f;
@@ -80,10 +99,15 @@ public class NPCSpawner : MonoBehaviour
         {
             if (!NavMesh.SamplePosition(spawnPoint, out NavMeshHit navHit, navMeshProbeRadius, NavMesh.AllAreas))
                 return false;
+
+            // optionally reject Crosswalk area hits
+            if (rejectCrosswalkArea && crosswalkMaskBit != 0 && (navHit.mask & crosswalkMaskBit) != 0)
+                return false;
+
             spawnPoint = navHit.position;
         }
 
-        // min spacing
+        // min spacing (against existing NPCs)
         if (Physics.CheckSphere(spawnPoint, minSpacing, npcLayer, QueryTriggerInteraction.Ignore))
             return false;
 

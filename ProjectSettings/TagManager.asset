@@ -11,6 +11,7 @@ TagManager:
   - NPC_Normal
   - NPC_Abnormal
   - PatrolPoint
+  - NPC_Enforcer
   layers:
   - Default
   - TransparentFX
@@ -21,8 +22,8 @@ TagManager:
   - SideWalk
   - NPCs
   - Static
-  - 
-  - 
+  - Vehicle
+  - Road
   - 
   - 
   - 

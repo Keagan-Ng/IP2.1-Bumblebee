@@ -6,11 +6,10 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class NPCBehaviour : MonoBehaviour
 {
+    // ===================== Public Violation Bus (static) =====================
     public static class ViolationSystem
     {
         public static event Action<Transform, Vector3, string> OnViolation;
-
-        /// Report a jaywalk or illegal cross. offender may be Player or NPC.
         public static void Report(Transform offender, Vector3 position, string reason)
         {
             OnViolation?.Invoke(offender, position, reason);
@@ -21,52 +20,37 @@ public class NPCBehaviour : MonoBehaviour
     public enum MoveState { Wander, Crossing, Chase }
 
     [Header("Identity (auto from Tag)")]
-    [Tooltip("If true (tag == NPC_Abnormal), this NPC may start an illegal crossing (jaywalk).")]
-    public bool isAbnormal;
-    [Tooltip("If true (tag == NPC_Enforcer), this NPC can chase offenders.")]
-    public bool isEnforcer;
+    public bool isAbnormal; // tag == NPC_Abnormal (may jaywalk)
+    public bool isEnforcer; // tag == NPC_Enforcer (chases offenders)
 
     [Header("State (debug)")]
     public MoveState state = MoveState.Wander;
 
     // ----------------------------- Wander config -----------------------------
     [Header("Wander")]
-    [Tooltip("Max radius for random roam picks.")]
     public float roamRadius = 15f;
-    [Tooltip("Seconds between path refreshes while roaming.")]
     public float repathInterval = 3f;
-    [Tooltip("Arrival threshold for roam destinations.")]
     public float arriveThreshold = 0.6f;
 
     // ---------------------------- Crossing config ----------------------------
     [Header("Crossing")]
-    [Tooltip("How far beyond the crosswalk center to target (toward far curb).")]
+    [Tooltip("How far past the crosswalk center to aim when choosing the far curb.")]
     public float crossBeyond = 3.5f;
-    [Tooltip("Tolerance for considering the far curb reached.")]
     public float crossArriveThreshold = 0.6f;
 
     [Header("Crossing Lockout")]
-    [Tooltip("Max crossings allowed inside window before lockout triggers.")]
-    public int crossLimit = 2;            // “cannot cross three roads in a row”
-    [Tooltip("Rolling time window (seconds) for counting crossings.")]
-    public float crossWindowSec = 30f;    // “…within 30 seconds”
-    [Tooltip("Lockout duration (seconds) after exceeding limit.")]
-    public float lockoutSec = 40f;        // “…locked out for 40 seconds”
+    [Tooltip("After 2 crossings within 30s, lock crossings for 40s.")]
+    public int   crossLimit     = 2;      // cannot cross three in a row
+    public float crossWindowSec = 30f;    // window
+    public float lockoutSec     = 40f;    // lock duration
 
     // ------------------------------ Chase config -----------------------------
     [Header("Chase (Enforcers only)")]
-    [Tooltip("Max chase distance to consider targets.")]
     public float viewDistance = 25f;
-    [Range(1f, 179f)]
-    [Tooltip("Chase only if offender is within this FOV cone (degrees).")]
-    public float viewAngle = 90f;
-    [Tooltip("Layers that block line-of-sight (0 = ignore).")]
+    [Range(1f,179f)] public float viewAngle = 90f;
     public LayerMask losObstacles;
-    [Tooltip("Give up if target not seen for this long (seconds).")]
     public float chaseForgetTime = 5f;
-    [Tooltip("Close enough to ‘catch’ target (no arrest logic here; just stop).")]
     public float arrestDistance = 2.0f;
-    [Tooltip("Speed multiplier while chasing.")]
     public float chaseSpeedMult = 1.25f;
 
     // ------------------------------ Animation --------------------------------
@@ -74,14 +58,17 @@ public class NPCBehaviour : MonoBehaviour
     public Animator animator;
     public string isWalkingBool = "isWalking";
 
+    [Header("Debug")]
+    public bool debugCrossing = false;
+
     // =============================== Runtime ================================
     NavMeshAgent agent;
     Vector3 currentWanderTarget;
     float repathTimer;
 
-    CrosswalkZone zoneInside;     // Trigger zone we’re currently in (if any)
-    CrosswalkZone activeCrossing; // Zone we are actively traversing
-    Vector3 crossingTarget;       // Far curb target position
+    CrosswalkZone zoneInside;    // zone we are standing in (curb)
+    CrosswalkZone activeCrossing; // zone we actually started to cross
+    Vector3 crossingTarget;      // far curb point
 
     readonly List<float> recentCrossTimes = new List<float>();
     float crossingLockUntil = 0f;
@@ -91,7 +78,11 @@ public class NPCBehaviour : MonoBehaviour
     float lastSeenTime = -999f;
     Vector3 lastSeenPos;
 
-    // =============================== Lifecycle ===============================
+    // --- Crosswalk area mask toggle (so we don't wander across when we shouldn't) ---
+    int crosswalkArea = -1;
+    int crosswalkMaskBit = 0;
+    int sidewalkMask = ~0; // agent's mask with Crosswalk bit removed
+
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -101,22 +92,34 @@ public class NPCBehaviour : MonoBehaviour
         isAbnormal = CompareTag("NPC_Abnormal");
         isEnforcer = CompareTag("NPC_Enforcer");
 
-        // Enforcers subscribe to violations
-        if (isEnforcer)
-            ViolationSystem.OnViolation += OnViolationHeard;
+        // Enforcers listen for violations
+        if (isEnforcer) ViolationSystem.OnViolation += OnViolationHeard;
+
+        // Cache Crosswalk area & masks
+        crosswalkArea = NavMesh.GetAreaFromName("Crosswalk");
+        if (crosswalkArea >= 0)
+        {
+            crosswalkMaskBit = 1 << crosswalkArea;
+            sidewalkMask = agent.areaMask & ~crosswalkMaskBit; // forbid Crosswalk by default
+        }
+        else
+        {
+            Debug.LogWarning("NavMesh area 'Crosswalk' not found. NPCs may wander across when they shouldn't.");
+            sidewalkMask = agent.areaMask;
+        }
     }
 
     void OnDestroy()
     {
-        if (isEnforcer)
-            ViolationSystem.OnViolation -= OnViolationHeard;
-
-        // If we vanish mid-cross, release the crossing for vehicles
+        if (isEnforcer) ViolationSystem.OnViolation -= OnViolationHeard;
         if (activeCrossing) activeCrossing.NotifyPedestrianEnd();
     }
 
     void OnEnable()
     {
+        // Forbid crosswalk area while wandering
+        if (crosswalkArea >= 0) agent.areaMask = sidewalkMask;
+
         PickNewWanderTarget(true);
         UpdateAnim();
     }
@@ -135,34 +138,30 @@ public class NPCBehaviour : MonoBehaviour
     // =============================== State: Wander ===============================
     void TickWander()
     {
-        // If we’re at a crosswalk and NOT locked, decide to cross (or wait).
         if (zoneInside && !IsCrossingLocked())
         {
             bool allowed = zoneInside.CanPedestrianStartCrossing();
+            if (debugCrossing)
+                Debug.Log($"{name}: at {zoneInside.name} allowed={allowed} type={zoneInside.type}");
 
-            // Abnormal NPCs may jaywalk (illegal start)
             if (!allowed && isAbnormal)
             {
                 BeginCross(illegal: true);
                 return;
             }
-
-            // Normal NPC: wait until legal
             if (allowed)
             {
                 BeginCross(illegal: false);
                 return;
             }
 
-            // Waiting at curb
+            // waiting at curb
             agent.isStopped = true;
             return;
         }
 
-        // Not at a crossing (or locked) → roam
+        // roam
         agent.isStopped = false;
-
-        // Basic repath cadence
         repathTimer -= Time.deltaTime;
         if (!agent.hasPath || agent.remainingDistance <= arriveThreshold || repathTimer <= 0f)
         {
@@ -171,8 +170,6 @@ public class NPCBehaviour : MonoBehaviour
             else
                 PickNewWanderTarget(false);
         }
-
-        // Passive detection for enforcers: if someone illegal is reported AND in FOV, OnViolationHeard will switch state.
     }
 
     // ============================== State: Crossing ==============================
@@ -181,20 +178,19 @@ public class NPCBehaviour : MonoBehaviour
         agent.isStopped = false;
         agent.SetDestination(crossingTarget);
 
-        // Arrived at far curb?
         if (!agent.pathPending &&
             (agent.remainingDistance <= crossArriveThreshold ||
              (transform.position - crossingTarget).sqrMagnitude <= crossArriveThreshold * crossArriveThreshold))
         {
-            // Clear crossing for vehicles
             activeCrossing?.NotifyPedestrianEnd();
-
-            // Count this crossing (may lock future ones)
             RegisterCrossing();
 
-            // Reset & resume wandering
             activeCrossing = null;
             zoneInside = null;
+
+            // Back to wander: forbid Crosswalk area again
+            if (crosswalkArea >= 0) agent.areaMask = sidewalkMask;
+
             state = MoveState.Wander;
             PickNewWanderTarget(true);
         }
@@ -205,37 +201,31 @@ public class NPCBehaviour : MonoBehaviour
     {
         if (!isEnforcer)
         {
-            // Safety: non-enforcers shouldn’t be here
             state = MoveState.Wander;
             return;
         }
 
         if (!chaseTarget)
         {
-            // Lost target completely
             state = MoveState.Wander;
             agent.speed = Mathf.Max(0.1f, agent.speed / chaseSpeedMult);
             PickNewWanderTarget(true);
             return;
         }
 
-        // Check FOV + LOS
         if (CanSee(chaseTarget, out var seenPos))
         {
             lastSeenPos = seenPos;
             lastSeenTime = Time.time;
         }
 
-        // Move toward last seen pos (or current target pos if visible)
         Vector3 goal = (Time.time - lastSeenTime <= chaseForgetTime) ? lastSeenPos : chaseTarget.position;
         agent.isStopped = false;
         agent.SetDestination(goal);
 
-        // "Catch"
         float dist = Vector3.Distance(transform.position, chaseTarget.position);
         if (dist <= arrestDistance)
         {
-            // End chase (you can add penalty/effects here)
             state = MoveState.Wander;
             agent.speed = Mathf.Max(0.1f, agent.speed / chaseSpeedMult);
             chaseTarget = null;
@@ -243,9 +233,8 @@ public class NPCBehaviour : MonoBehaviour
             return;
         }
 
-        // Give up if unseen for too long and far from lastSeenPos
         if (Time.time - lastSeenTime > chaseForgetTime &&
-            Vector3.Distance(transform.position, goal) < 1.0f) // reached last-known
+            Vector3.Distance(transform.position, goal) < 1.0f)
         {
             state = MoveState.Wander;
             agent.speed = Mathf.Max(0.1f, agent.speed / chaseSpeedMult);
@@ -257,45 +246,57 @@ public class NPCBehaviour : MonoBehaviour
     // =============================== Crossing flow ===============================
     void BeginCross(bool illegal)
     {
-        // Compute a far curb target (based on crosswalk center)
-        crossingTarget = ComputeFarCurbTarget(zoneInside);
-        if (!SampleNav(ref crossingTarget))
+        // Allow Crosswalk area while crossing
+        if (crosswalkArea >= 0) agent.areaMask = sidewalkMask | crosswalkMaskBit;
+
+        // Try both sides of the strip; then snap to SIDEWALK (exclude Crosswalk) for the final target
+        Vector3 center = zoneInside.transform.position;
+        Vector3 dir = center - transform.position; dir.y = 0f;
+        if (dir.sqrMagnitude < 0.001f) dir = transform.forward;
+        dir.Normalize();
+
+        Vector3 cand1 = center + dir * crossBeyond;
+        Vector3 cand2 = center - dir * crossBeyond;
+
+        if (!TryFindSidewalk(cand1, out crossingTarget) && !TryFindSidewalk(cand2, out crossingTarget))
         {
-            // Couldn’t find a valid nav point; just keep roaming
+            if (debugCrossing) Debug.LogWarning($"{name}: crossing target sample failed at {zoneInside.name}");
+            // Revert mask and keep roaming
+            if (crosswalkArea >= 0) agent.areaMask = sidewalkMask;
             agent.isStopped = false;
             PickNewWanderTarget(false);
             return;
         }
 
-        // Tell cars to yield while we cross
         zoneInside.NotifyPedestrianStart();
         activeCrossing = zoneInside;
 
-        // Report violation if this was an illegal start (Abnormal jaywalk or player will be reported elsewhere)
         if (illegal)
             ViolationSystem.Report(transform, transform.position, "Jaywalk");
 
-        // Start moving
         agent.isStopped = false;
         state = MoveState.Crossing;
         agent.SetDestination(crossingTarget);
+
+        if (debugCrossing) Debug.Log($"{name}: crossing {zoneInside.name} -> {crossingTarget}");
     }
 
-    Vector3 ComputeFarCurbTarget(CrosswalkZone cz)
+    // Sample ONLY sidewalk (exclude Crosswalk area) for the end point
+    bool TryFindSidewalk(Vector3 probe, out Vector3 result)
     {
-        Vector3 center = cz.transform.position;
-        Vector3 toCenter = center - transform.position; toCenter.y = 0f;
-        Vector3 dir = toCenter.sqrMagnitude > 0.0001f ? toCenter.normalized : transform.forward;
-        var tgt = center + dir * crossBeyond;
-        tgt.y = transform.position.y;
-        return tgt;
+        result = probe;
+        int maskNoCrosswalk = (crosswalkArea >= 0) ? (sidewalkMask) : agent.areaMask;
+        if (NavMesh.SamplePosition(probe, out var hit, 2.5f, maskNoCrosswalk))
+        {
+            result = hit.position;
+            return true;
+        }
+        return false;
     }
 
     void RegisterCrossing()
     {
         float now = Time.time;
-
-        // prune old
         for (int i = recentCrossTimes.Count - 1; i >= 0; i--)
             if (now - recentCrossTimes[i] > crossWindowSec) recentCrossTimes.RemoveAt(i);
 
@@ -311,16 +312,12 @@ public class NPCBehaviour : MonoBehaviour
     void OnViolationHeard(Transform offender, Vector3 pos, string reason)
     {
         if (!isEnforcer || offender == null || offender == transform) return;
-
-        // Check if offender is within FOV + LOS
         if (!CanSee(offender, out var seenPos)) return;
 
-        // Begin/refresh chase
         chaseTarget = offender;
         lastSeenPos = seenPos;
         lastSeenTime = Time.time;
 
-        // Boost speed
         agent.speed *= chaseSpeedMult;
         state = MoveState.Chase;
         agent.isStopped = false;
@@ -405,16 +402,6 @@ public class NPCBehaviour : MonoBehaviour
         return false;
     }
 
-    bool SampleNav(ref Vector3 pos)
-    {
-        if (NavMesh.SamplePosition(pos, out var hit, 2.0f, NavMesh.AllAreas))
-        {
-            pos = hit.position;
-            return true;
-        }
-        return false;
-    }
-
     // ============================== Animation sync ============================
     void UpdateAnim()
     {
@@ -436,9 +423,7 @@ public class NPCBehaviour : MonoBehaviour
         if (cz != null)
         {
             zoneInside = cz;
-
-            // If currently locked, keep moving and step away soon
-            if (IsCrossingLocked()) agent.isStopped = false;
+            if (debugCrossing) Debug.Log($"{name}: entered crosswalk {cz.name}");
         }
     }
 
@@ -447,6 +432,7 @@ public class NPCBehaviour : MonoBehaviour
         var cz = other.GetComponent<CrosswalkZone>();
         if (cz != null && cz == zoneInside)
         {
+            if (debugCrossing) Debug.Log($"{name}: left crosswalk {cz.name}");
             zoneInside = null;
             if (state == MoveState.Wander) agent.isStopped = false;
         }

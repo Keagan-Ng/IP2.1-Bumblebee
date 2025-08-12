@@ -3,46 +3,52 @@ using UnityEngine;
 
 public enum CrosswalkType { Signalised, Zebra }
 
-/// Place this on a GameObject centered on the crossing (ideally with a thin trigger covering the zebra).
-/// For signalised crossings, assign a TrafficLightController-like source (any script exposing IsRedForVehicles()).
-/// For zebra crossings, we use VehicleBehaviour.All to check nearest car distance.
 public class CrosswalkZone : MonoBehaviour
 {
     [Header("Type")]
     public CrosswalkType type = CrosswalkType.Zebra;
 
-    [Header("Signalised (optional)")]
-    public MonoBehaviour trafficLightSource; // any component that has a bool IsRedForVehicles() method
+    [Header("Signalised (assign a TrafficLightLeg here)")]
+    [SerializeField] MonoBehaviour trafficLightSource; // must implement IVehicleSignalSource
+    IVehicleSignalSource signalProvider;               // cached cast
 
     [Header("Zebra settings")]
-    [Tooltip("Pedestrians may start crossing when the nearest vehicle is farther than this (world units).")]
+    [Tooltip("Peds may start when the nearest vehicle is farther than this (units).")]
     public float zebraMinCarDistance = 3f;
 
     [Header("Debug")]
     public bool someoneIsCrossing = false; // set by pedestrians when they start/finish
 
+    void Awake()
+    {
+        if (trafficLightSource != null)
+        {
+            signalProvider = trafficLightSource as IVehicleSignalSource;
+            if (signalProvider == null)
+                Debug.LogWarning($"{name}: trafficLightSource does not implement IVehicleSignalSource.");
+        }
+    }
+
     // --- API used by NPCs ---
     public bool CanPedestrianStartCrossing()
     {
         if (type == CrosswalkType.Signalised)
-            return IsRedForVehicles(); // red for vehicles = walk for peds
+            return signalProvider != null && signalProvider.IsRedForVehicles(); // vehicles red => peds walk
         else
             return someoneIsCrossing || NearestVehicleDistance() > zebraMinCarDistance;
     }
+
+    public bool IsRedForVehicles()
+    {
+        if (type != CrosswalkType.Signalised) return false;
+        return signalProvider != null && signalProvider.IsRedForVehicles();
+    }
+
 
     public void NotifyPedestrianStart() => someoneIsCrossing = true;
     public void NotifyPedestrianEnd()   => someoneIsCrossing = false;
 
     // --- Helpers ---
-    public bool IsRedForVehicles()
-    {
-        if (trafficLightSource == null) return false;
-        // duck-typed call: look for a method named "IsRedForVehicles" returning bool
-        var m = trafficLightSource.GetType().GetMethod("IsRedForVehicles", System.Type.EmptyTypes);
-        if (m == null || m.ReturnType != typeof(bool)) return false;
-        return (bool)m.Invoke(trafficLightSource, null);
-    }
-
     public float NearestVehicleDistance()
     {
         float best = float.PositiveInfinity;
@@ -60,11 +66,15 @@ public class CrosswalkZone : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = (type == CrosswalkType.Zebra) ? new Color(0f,1f,0f,0.25f) : new Color(1f,0.8f,0f,0.25f);
-        Gizmos.DrawWireCube(transform.position, new Vector3(12.62f, 0.05f, 3.36f));
         if (type == CrosswalkType.Zebra)
         {
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(transform.position, zebraMinCarDistance);
         }
     }
+
+    // (optional) global registry for vehicles to auto-detect crossings
+    public static readonly List<CrosswalkZone> All = new List<CrosswalkZone>();
+    void OnEnable()  { if (!All.Contains(this)) All.Add(this); }
+    void OnDisable() { All.Remove(this); }
 }

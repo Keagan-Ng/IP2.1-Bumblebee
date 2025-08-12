@@ -265,6 +265,7 @@ GameObject:
   - component: {fileID: 6749806273665475345}
   - component: {fileID: 8956264680543808109}
   - component: {fileID: 5302836810391391769}
+  - component: {fileID: 6545338095378280280}
   m_Layer: 0
   m_Name: CrossingZone
   m_TagString: Untagged
@@ -281,7 +282,7 @@ Transform:
   m_GameObject: {fileID: 4018340021745159639}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.3035965, y: -0.053320408, z: -1.7009773}
+  m_LocalPosition: {x: -6.3035965, y: 0.3, z: -1.7009773}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -306,7 +307,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 12.62, y: 0.1, z: 3.36}
+  m_Size: {x: 15, y: 0.1, z: 3.36}
   m_Center: {x: 0, y: 0.1, z: 0}
 --- !u!114 &5302836810391391769
 MonoBehaviour:
@@ -324,6 +325,26 @@ MonoBehaviour:
   trafficLightSource: {fileID: 0}
   zebraMinCarDistance: 13
   someoneIsCrossing: 0
+--- !u!114 &6545338095378280280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4018340021745159639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 3
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: f46d2d58
 --- !u!1 &6182194782291913014
 GameObject:
   m_ObjectHideFlags: 0
