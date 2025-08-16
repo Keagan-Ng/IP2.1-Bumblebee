@@ -91,22 +91,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0d73b899de538648b52c681d5cf69c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cruiseSpeed: 6
-  accel: 4
-  brakingDecel: 8
-  stopLookahead: 8
-  vehicleLayer:
-    serializedVersion: 2
-    m_Bits: 512
-  followLookahead: 16
-  minGap: 10
-  timeHeadway: 1.5
-  leaderMatchGain: 0.8
-  graceAfterGreenSec: 6
-  isSBS: 0
-  busStopDwellSeconds: 5
-  busStopCooldown: 10
-  busStopLeftDot: 0.65
+  path: {fileID: 0}
+  waypointReachDist: 1
+  speed: 8
+  turnSpeed: 8
+  safeGap: 6
+  autoPickStartNode: 1
+  minForwardDot: 0.2
+  snapToCenterline: 1
+  snapMaxDistance: 6
+  useRigidbodyIfPresent: 1
+  SharedPathCars: []
 --- !u!1 &8187244965493915685
 GameObject:
   m_ObjectHideFlags: 0
@@ -118,7 +113,6 @@ GameObject:
   - component: {fileID: 63797326999310197}
   - component: {fileID: 3715064541138529848}
   - component: {fileID: 4718642030909232848}
-  - component: {fileID: 9054430602476223179}
   m_Layer: 9
   m_Name: Car_Black
   m_TagString: Untagged
@@ -194,28 +188,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &9054430602476223179
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8187244965493915685}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 8265990233259357616, guid: be7383ae0ab30294a98ed73f49e9a233, type: 3}
 --- !u!1001 &7778525490691436893
 PrefabInstance:
   m_ObjectHideFlags: 0

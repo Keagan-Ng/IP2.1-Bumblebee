@@ -9,6 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6111204952579879108}
+  - component: {fileID: 8306979144492185529}
+  - component: {fileID: 4642034708880231010}
+  - component: {fileID: 550289303345233067}
+  - component: {fileID: 1388120029494983229}
   m_Layer: 8
   m_Name: Crossing
   m_TagString: Untagged
@@ -29,14 +33,128 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1120188884056968516}
+  - {fileID: 6749806273665475345}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &8306979144492185529
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206290618458954125}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3.2, y: 3, z: 13.26}
+  m_Center: {x: -9.53, y: 1.5, z: -10}
+--- !u!54 &4642034708880231010
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206290618458954125}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &550289303345233067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206290618458954125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10d65c8cbe5e934459875fc5544ce382, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trafficLightSource: {fileID: 550289303345233067}
+  crosswalk: {fileID: 5302836810391391769}
+  stopPoint: {fileID: 6749806273665475345}
+  stopBackOffset: 1
+  ensureKinematicRB: 1
+--- !u!114 &1388120029494983229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206290618458954125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd35231319d91a340a47c60f63614cba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 0}
+  group: 1
+  vehRed: {fileID: 0}
+  vehYellow: {fileID: 0}
+  vehGreen: {fileID: 0}
+--- !u!1 &1269606700591492978
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1120188884056968516}
+  m_Layer: 8
+  m_Name: Crossing_model
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1120188884056968516
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1269606700591492978}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
   - {fileID: 7057181785243127323}
   - {fileID: 7939959782149341017}
   - {fileID: 4762907745974383308}
   - {fileID: 2689432550202132269}
   - {fileID: 407278376176513634}
   - {fileID: 3415376128893903102}
-  - {fileID: 6749806273665475345}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 6111204952579879108}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1289042754210757383
 GameObject:
@@ -70,7 +188,7 @@ Transform:
   m_LocalScale: {x: 3.4171896, y: 0.10664101, z: 3.4019516}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6111204952579879108}
+  m_Father: {fileID: 1120188884056968516}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8471335853808626533
 MeshFilter:
@@ -178,7 +296,7 @@ Transform:
   m_LocalScale: {x: 3.4171896, y: 0.10664101, z: 3.4019516}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6111204952579879108}
+  m_Father: {fileID: 1120188884056968516}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8721697166022672109
 MeshFilter:
@@ -322,7 +440,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
-  trafficLightSource: {fileID: 0}
+  trafficLightSource: {fileID: 1388120029494983229}
   zebraMinCarDistance: 13
   someoneIsCrossing: 0
 --- !u!114 &6545338095378280280
@@ -377,7 +495,7 @@ Transform:
   m_LocalScale: {x: 3.4171896, y: 0.10664101, z: 3.4019516}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6111204952579879108}
+  m_Father: {fileID: 1120188884056968516}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2319296230732568392
 MeshFilter:
@@ -485,7 +603,7 @@ Transform:
   m_LocalScale: {x: 3.4171896, y: 0.10664101, z: 3.4019516}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6111204952579879108}
+  m_Father: {fileID: 1120188884056968516}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4375664532762139105
 MeshFilter:
@@ -593,7 +711,7 @@ Transform:
   m_LocalScale: {x: 3.4171896, y: 0.10664101, z: 3.4019516}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6111204952579879108}
+  m_Father: {fileID: 1120188884056968516}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2986500764630275719
 MeshFilter:
@@ -701,7 +819,7 @@ Transform:
   m_LocalScale: {x: 3.4171896, y: 0.10664101, z: 3.4019516}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6111204952579879108}
+  m_Father: {fileID: 1120188884056968516}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3397066884752795147
 MeshFilter:

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 8661677466018631139}
   - component: {fileID: 2135717220580646253}
   - component: {fileID: 8801492651562401949}
-  - component: {fileID: 3175022617594158438}
   m_Layer: 9
   m_Name: SBS
   m_TagString: Untagged
@@ -87,28 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3175022617594158438
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2415802189695877764}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8366528330160380360, guid: 9631d3ad3de6e344e94941c272b0474b, type: 3}
 --- !u!1 &5271377773001586003
 GameObject:
   m_ObjectHideFlags: 0
@@ -120,7 +97,6 @@ GameObject:
   - component: {fileID: 1163503491566829919}
   - component: {fileID: 2552739432217562817}
   - component: {fileID: 4382307134783649506}
-  - component: {fileID: 6415034884462564459}
   - component: {fileID: 2088192797979604655}
   m_Layer: 9
   m_Name: SBS
@@ -189,33 +165,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.49, y: 3, z: 12.48}
   m_Center: {x: 0, y: 1.45, z: 0.001}
---- !u!54 &6415034884462564459
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5271377773001586003}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &2088192797979604655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -228,22 +177,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0d73b899de538648b52c681d5cf69c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cruiseSpeed: 6
-  accel: 4
-  brakingDecel: 8
-  stopLookahead: 8
-  vehicleLayer:
-    serializedVersion: 2
-    m_Bits: 512
-  followLookahead: 16
-  minGap: 16
-  timeHeadway: 1.5
-  leaderMatchGain: 0.8
-  graceAfterGreenSec: 6
-  isSBS: 1
-  busStopDwellSeconds: 5
-  busStopCooldown: 10
-  busStopLeftDot: 0.65
+  path: {fileID: 0}
+  waypointReachDist: 1
+  speed: 8
+  turnSpeed: 8
+  safeGap: 6
+  autoPickStartNode: 1
+  minForwardDot: 0.2
+  snapToCenterline: 1
+  snapMaxDistance: 6
+  useRigidbodyIfPresent: 1
+  SharedPathCars: []
 --- !u!1001 &3338774893747097286
 PrefabInstance:
   m_ObjectHideFlags: 0
