@@ -135,11 +135,8 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        // 2) hand off to GameManager (which handles saving/cloud/PlayerPrefs)
-        GameManager.Instance.SaveUsername(username);
-
-        // 3) load your game
-        SceneManager.LoadScene(gameSceneName);
+        // 3) load game
+        SceneManager.LoadScene("MainGame");
     }
 
     private static class UsernameTruncator
